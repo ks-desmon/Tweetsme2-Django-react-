@@ -15,9 +15,20 @@ Replace me
     const url = '/tweets'
     const responseType = 'json'
 
-    function formatTweetElement(tweetObj)
+    function handleDidLike(tweet_id,currentCount){
+        console.log(tweet_id,currentCount)
+        return
+    }
+
+    function likeBtn(tweet)
     {
-        var formattedTweet = "<div class='mb-4' id='"+tweetObj+"'><p>"+tweetObj.content+"</p></div>";
+        return "<button class = 'btn btn-primary' onclick = handleDidLike("+tweet.id+","+tweet.likes+")>"+tweet.likes+" Like</button>"
+    }
+
+    function formatTweetElement(tweet)
+    {
+        var formattedTweet = "<div class='mb-4' id='"+tweet+"'><p>"+tweet.content+
+            "</p><div class = 'btn-group'>"+likeBtn(tweet)+"</div></div>";
         return formattedTweet
     }
 
@@ -32,9 +43,8 @@ Replace me
             var currentItem = formatTweetElement(tweetObj)
             finalTweetStr +=currentItem
         }
-        console.log(finalTweetStr)
+        // console.log(finalTweetStr)
         tweetsElement.innerHTML = finalTweetStr
-
     }
     xhr.send()
     
