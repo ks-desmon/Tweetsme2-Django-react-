@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse , Http404
+from django.http import HttpResponse , Http404 , JsonResponse
 from .models import Tweet
 # Create your views here.
 
@@ -9,8 +9,29 @@ def home_view(request, *args, **kwargs):
 
 def tweet_detail_view(request,tweet_id, *args, **kwargs):
     # print(args , kwargs)
+    # Get single data from model
+    # try:
+    #     obj = Tweet.objects.get(id=tweet_id)                    
+    # except:
+    #     raise Http404
+    # return HttpResponse(f'{tweet_id}Hello world {obj.content}')
+
+
+    #    '''Rest API  For Returning JSON data'''
+    
+        
     try:
         obj = Tweet.objects.get(id=tweet_id)
+        data = {
+            "id" : tweet_id,
+            "Content" : obj.content
+        }
+        status = 200
     except:
-        raise Http404
-    return HttpResponse(f'{tweet_id}Hello world {obj.content}')
+        data = {
+            "id" : tweet_id,
+            "message" : "id not found"
+        }
+        status = 400
+        
+    return JsonResponse(data,status=status)
