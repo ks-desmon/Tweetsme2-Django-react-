@@ -19,7 +19,6 @@ def tweet_create_view(request, *args, **kwargs):
         obj.save()
         if nextUrl !=None:
             return redirect(nextUrl)
-            print('I am working************',nextUrl)
         form = TweetForm()
     return render(request, 'components/form.html', context={"form":form})
 
