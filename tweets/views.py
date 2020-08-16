@@ -8,6 +8,15 @@ def home_view(request, *args, **kwargs):
     #return HttpResponse('Hello world')
     return render(request, "pages/home.html", context={}, status=200)
 
+def tweet_list_view(request ,*args , **kwargs):
+    #select all values from model
+    qs = Tweet.objects.all()
+    tweet_list = [{"id":x.id,"content":x.content}for x in qs]
+    data = {
+        "response" : tweet_list
+    }
+    return JsonResponse(data,status=200)
+
 def tweet_detail_view(request,tweet_id, *args, **kwargs):
     # print(args , kwargs)
     # Get single data from model
