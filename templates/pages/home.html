@@ -2,22 +2,41 @@
 
 {% block content %}
 
-<h1>welcome to tweetme2</h1>
+<div id="tweets">
+Replace me
+</div>
 
 <script>
+    var tweetsElement = document.getElementById("tweets")
+
     const xhr = new XMLHttpRequest()
 
     const method = 'GET'
     const url = '/tweets'
     const responseType = 'json'
 
+    function formatTweetElement(tweetObj)
+    {
+        var formattedTweet = "<div class='mb-4' id='"+tweetObj+"'><p>"+tweetObj.content+"</p></div>";
+        return formattedTweet
+    }
+
     xhr.responseType = responseType
     xhr.open(method,url)
     xhr.onload = function(){
-        console.log(xhr.response)
+        const listedItems = xhr.response.response
+        var finalTweetStr = ""
+        var i
+        for(i=0; i<listedItems.length; i++){
+            var tweetObj = listedItems[i]
+            var currentItem = formatTweetElement(tweetObj)
+            finalTweetStr +=currentItem
+        }
+        console.log(finalTweetStr)
+        tweetsElement.innerHTML = finalTweetStr
+
     }
     xhr.send()
-
     
 </script>
 {%endblock content%}
