@@ -14,7 +14,7 @@ tweets
         text 
         image
     delete
-    retweeting
+    retweeting,liking
 
 following / follower
 
