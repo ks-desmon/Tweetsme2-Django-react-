@@ -2,8 +2,14 @@
 
 {% block content %}
 
-<div id="tweets">
-Replace me
+<div class="row text-center">
+    <div class="col">
+        <h1>Welcome tweetme</h1>
+    </div>
+</div>
+
+<div class="row" id="tweets">
+
 </div>
 
 <script>
@@ -27,7 +33,7 @@ Replace me
 
     function formatTweetElement(tweet)
     {
-        var formattedTweet = "<div class='mb-4' id='"+tweet+"'><p>"+tweet.content+
+        var formattedTweet = "<div class='mb-4 col-md-10 col-12 mx-auto py-3 border rounded' id='"+tweet.id+"'><p>"+tweet.content+
             "</p><div class = 'btn-group'>"+likeBtn(tweet)+"</div></div>";
         return formattedTweet
     }
