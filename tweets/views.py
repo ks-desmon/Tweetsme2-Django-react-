@@ -5,7 +5,8 @@ from .models import Tweet
 
 def home_view(request, *args, **kwargs):
     print(args , kwargs)
-    return HttpResponse('Hello world')
+    #return HttpResponse('Hello world')
+    return render(request, "pages/home.html", context={}, status=200)
 
 def tweet_detail_view(request,tweet_id, *args, **kwargs):
     # print(args , kwargs)
@@ -18,8 +19,8 @@ def tweet_detail_view(request,tweet_id, *args, **kwargs):
 
 
     #    '''Rest API  For Returning JSON data'''
-    
-        
+
+
     try:
         obj = Tweet.objects.get(id=tweet_id)
         data = {
