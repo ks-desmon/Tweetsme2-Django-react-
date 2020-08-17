@@ -32,8 +32,26 @@
 
 <script>
   function handleTweetCreateFormDidSubmit(event) {
-    event.preventDefault();
-    console.log(event);
+    event.preventDefault(); // Prevent Form Submit via JavaScript
+    myForm = event.target;
+    const myFormData = new FormData(myForm);
+    // check data inside the form
+    // console.log(myFormData.entries(), "checking");
+    // for (var myItem of myFormData.entries()) {
+    //   console.log(myItem);
+    // }
+    // console.log(event, myform);
+    const url = myForm.getAttribute("action");
+    const method = myForm.getAttribute("method");
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.onload = function () {
+      const serverResponse = xhr.response;
+      // console.log(serverResponse);
+      var tweetsEL = document.getElementById("tweets");
+      loadTweets(tweetsEL);
+    };
+    xhr.send(myFormData);
   }
 
   var tweetsEL = document.getElementById("tweets");
@@ -44,10 +62,10 @@
 
   const loadTweets = function (tweetsElement) {
     // Get the data with js sended by django url
-    const xhr = new XMLHttpRequest();
     const method = "GET";
     const url = "/tweets";
     const responseType = "json";
+    const xhr = new XMLHttpRequest();
     xhr.responseType = responseType;
     xhr.open(method, url);
     xhr.onload = function () {
