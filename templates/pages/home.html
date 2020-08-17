@@ -8,7 +8,12 @@
 
 <div class="row mb-3">
   <div class="col-md-4 mx-auto col-10">
-    <form class="form" method="POST" action="create-tweet/">
+    <form
+      class="form"
+      id="tweet-create-form"
+      method="POST"
+      action="create-tweet/"
+    >
       {% csrf_token %}
       <input type="hidden" value="/" name="next" />
       <textarea
@@ -26,13 +31,40 @@
 <div class="row" id="tweets"></div>
 
 <script>
-  var tweetsElement = document.getElementById("tweets");
+  function handleTweetCreateFormDidSubmit(event) {
+    event.preventDefault();
+    console.log(event);
+  }
 
-  const xhr = new XMLHttpRequest();
+  var tweetsEL = document.getElementById("tweets");
 
-  const method = "GET";
-  const url = "/tweets";
-  const responseType = "json";
+  var tweetCreateFormEL = document.getElementById("tweet-create-form");
+
+  tweetCreateFormEL.addEventListener("submit", handleTweetCreateFormDidSubmit);
+
+  const loadTweets = function (tweetsElement) {
+    // Get the data with js sended by django url
+    const xhr = new XMLHttpRequest();
+    const method = "GET";
+    const url = "/tweets";
+    const responseType = "json";
+    xhr.responseType = responseType;
+    xhr.open(method, url);
+    xhr.onload = function () {
+      const listedItems = xhr.response.response;
+      var finalTweetStr = "";
+      var i;
+      for (i = 0; i < listedItems.length; i++) {
+        var tweetObj = listedItems[i];
+        var currentItem = formatTweetElement(tweetObj);
+        finalTweetStr += currentItem;
+      }
+      tweetsElement.innerHTML = finalTweetStr;
+    };
+    xhr.send();
+  };
+
+  loadTweets(tweetsEL);
 
   function handleDidLike(tweet_id, currentCount) {
     console.log(tweet_id, currentCount);
@@ -62,21 +94,5 @@
       "</div></div>";
     return formattedTweet;
   }
-
-  xhr.responseType = responseType;
-  xhr.open(method, url);
-  xhr.onload = function () {
-    const listedItems = xhr.response.response;
-    var finalTweetStr = "";
-    var i;
-    for (i = 0; i < listedItems.length; i++) {
-      var tweetObj = listedItems[i];
-      var currentItem = formatTweetElement(tweetObj);
-      finalTweetStr += currentItem;
-    }
-    // console.log(finalTweetStr)
-    tweetsElement.innerHTML = finalTweetStr;
-  };
-  xhr.send();
 </script>
 {%endblock content%}
