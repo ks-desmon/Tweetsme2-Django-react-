@@ -1,37 +1,36 @@
 {% extends 'base.html' %} {% block content %}
-
 <div class="row text-center">
   <div class="col">
     <h1>Welcome tweetme</h1>
   </div>
 </div>
-
 <div class="row mb-3">
   <div class="col-md-4 mx-auto col-10">
-    <form
-      class="form"
-      id="tweet-create-form"
-      method="POST"
-      action="create-tweet/"
-    >
+    <form class="form" id="tweet-create-form" method="POST" action="create-tweet/">
       {% csrf_token %}
+      <div class='alert d-none alert-danger' id='tweet-create-form-error'></div>
       <input type="hidden" value="/" name="next" />
-      <textarea
-        required="required"
-        class="form-control"
-        name="content"
-        placeholder="Your Tweet ...."
-      ></textarea>
+      <textarea required="required" class="form-control" name="content" placeholder="Your Tweet ...."></textarea>
       <button type="submit" class="btn btn-primary">
         Tweet
       </button>
     </form>
   </div>
 </div>
-
 <div class="row" id="tweets"></div>
-
 <script>
+
+  function handleTweetFormError(msg, display) {
+    const myErrorDiv = document.getElementById('tweet-create-form-error')
+    if (display === true) {
+      myErrorDiv.setAttribute('class', 'alert d-block alert-danger')
+      myErrorDiv.innerHTML = msg
+    } else {
+      myErrorDiv.setAttribute('class', 'alert d-none alert-danger')
+      myErrorDiv.innerHTML = ""
+    }
+  }
+
   function handleTweetCreateFormDidSubmit(event) {
     event.preventDefault(); // Prevent Form Submit via JavaScript
     myForm = event.target;
@@ -46,7 +45,8 @@
     const url = myForm.getAttribute("action");
     const method = myForm.getAttribute("method");
     const responseType = "json";
-    xhr.response = responseType;
+    xhr.response = "json";
+    console.log(xhr.response)
     xhr.open(method, url);
     xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -54,6 +54,7 @@
       // const newTweet = xhr.response;
       // console.log(serverResponse , xhr.status);
       if (xhr.status === 201) {
+        handleTweetFormError('', false)
         const newTweet = xhr.response;
         const newTweetJson = JSON.parse(newTweet);
         // console.log(newTweetJson);
@@ -62,10 +63,34 @@
         ogHtml = tweetContainerElement.innerHTML;
         tweetContainerElement.innerHTML = newTweentElement + ogHtml; // add reverse and new tweet will upoad at last
         myForm.reset(); //make form blank again
+      } else if (xhr.status === 400) {
+        //error form submittion
+        const errorJson = JSON.parse(xhr.response);
+        //console.log(errorJson,'errorJson')
+        const contentError = errorJson.content
+        // console.log(contentError,'contentError')
+        let contentErrorMsg
+        if (contentError) {
+          // console.log('that worked')
+          contentErrorMsg = contentError[0]
+
+          handleTweetFormError(contentErrorMsg, true)
+        } else {
+          alert("an error occured. try again")
+        }
+        console.log(contentError, 'contentError')
+      } else if (xhr.status === 500) {
+        //error on python code or server
+        const errorJson = xhr.response;
+        console.log(errorJson);
       }
       // reloading all tweets again so no need to call or refresh home page for loading new tweets
       // var tweetsEL = document.getElementById("tweets");
       // loadTweets(tweetsEL);
+    };
+    //for major error like server is not working
+    xhr.onerror = function () {
+      alert("An unknown error occured");
     };
     xhr.send(myFormData);
   }
@@ -84,6 +109,10 @@
     const xhr = new XMLHttpRequest();
     xhr.responseType = responseType;
     xhr.open(method, url);
+
+
+
+
     xhr.onload = function () {
       const listedItems = xhr.response.response;
       var finalTweetStr = "";
