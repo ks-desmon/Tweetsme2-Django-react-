@@ -17,6 +17,7 @@
       {% csrf_token %}
       <input type="hidden" value="/" name="next" />
       <textarea
+        required="required"
         class="form-control"
         name="content"
         placeholder="Your Tweet ...."
@@ -41,29 +42,42 @@
     //   console.log(myItem);
     // }
     // console.log(event, myform);
+    const xhr = new XMLHttpRequest();
     const url = myForm.getAttribute("action");
     const method = myForm.getAttribute("method");
-    const xhr = new XMLHttpRequest();
+    const responseType = "json";
+    xhr.response = responseType;
     xhr.open(method, url);
     xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     xhr.onload = function () {
-      const serverResponse = xhr.response;
-      console.log(serverResponse);
-      var tweetsEL = document.getElementById("tweets");
-      loadTweets(tweetsEL);
+      // const newTweet = xhr.response;
+      // console.log(serverResponse , xhr.status);
+      if (xhr.status === 201) {
+        const newTweet = xhr.response;
+        const newTweetJson = JSON.parse(newTweet);
+        // console.log(newTweetJson);
+        // console.log(formatTweetElement(newTweetJson));
+        const newTweentElement = formatTweetElement(newTweetJson);
+        ogHtml = tweetContainerElement.innerHTML;
+        tweetContainerElement.innerHTML = newTweentElement + ogHtml; // add reverse and new tweet will upoad at last
+        myForm.reset(); //make form blank again
+      }
+      // reloading all tweets again so no need to call or refresh home page for loading new tweets
+      // var tweetsEL = document.getElementById("tweets");
+      // loadTweets(tweetsEL);
     };
     xhr.send(myFormData);
   }
 
-  var tweetsEL = document.getElementById("tweets");
+  var tweetContainerElement = document.getElementById("tweets");
 
   var tweetCreateFormEL = document.getElementById("tweet-create-form");
 
   tweetCreateFormEL.addEventListener("submit", handleTweetCreateFormDidSubmit);
 
   const loadTweets = function (tweetsElement) {
-    // Get the data with js sended by django url
+    // Get the all data with js sended by django url
     const method = "GET";
     const url = "/tweets";
     const responseType = "json";
@@ -84,7 +98,7 @@
     xhr.send();
   };
 
-  loadTweets(tweetsEL);
+  loadTweets(tweetContainerElement); //load the tweets
 
   function handleDidLike(tweet_id, currentCount) {
     console.log(tweet_id, currentCount);

@@ -9,7 +9,7 @@ from django.utils.http import is_safe_url
 
 
 def home_view(request, *args, **kwargs):
-    #print(args , kwargs)
+    print('hi there', args, kwargs)
     # return HttpResponse('Hello world')
     return render(request, "pages/home.html", context={}, status=200)
 
@@ -25,7 +25,8 @@ def tweet_create_view(request, *args, **kwargs):
         # Do other form logic
         obj.save()
         if request.is_ajax():
-            return JsonResponse({}, status=201)
+            return JsonResponse(obj.serialize(), status=201)
+            # return JsonResponse({}, status=201)
         if nextUrl != None and is_safe_url(nextUrl, ALLOWED_HOSTS):
             return redirect(nextUrl)
         form = TweetForm()
@@ -35,14 +36,17 @@ def tweet_create_view(request, *args, **kwargs):
 def tweet_list_view(request, *args, **kwargs):
     # select all values from model
     qs = Tweet.objects.all()
-    tweet_list = [{"id": x.id,
-                   "content": x.content,
-                   "likes": random.randint(1, 90)}for x in qs]
+
+    tweet_list = [x.serialize() for x in qs]
+
+    # tweet_list = [{"id": x.id,
+    #                "content": x.content,
+    #                "likes": random.randint(1, 90)}for x in qs]
     data = {
-        "response": tweet_list,
-        'testing': "request"
+        "response": tweet_list
     }
-    return JsonResponse(data, status=200)
+    status = 201
+    return JsonResponse(data, status=status)
 
 
 def tweet_detail_view(request, tweet_id, *args, **kwargs):
