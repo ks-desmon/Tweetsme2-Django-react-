@@ -1,71 +1,82 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <div class="row text-center">
-    <div class="col">
-        <h1>Welcome tweetme</h1>
-    </div>
+  <div class="col">
+    <h1>Welcome tweetme</h1>
+  </div>
 </div>
 
 <div class="row mb-3">
-    <div class="col-md-4 mx-auto col-10">
-        <form class='form' method="POST" action='create-tweet/'>
-        {% csrf_token %}
-        <input type="hidden" value='/' name='next' />
-        <textarea class="form-control" name="content" placeholder="Your Tweet ...."></textarea>
-        <button type="submit" class="btn btn-primary">
-            Tweet
-        </button>
-        </form>
-    </div>
+  <div class="col-md-4 mx-auto col-10">
+    <form class="form" method="POST" action="create-tweet/">
+      {% csrf_token %}
+      <input type="hidden" value="/" name="next" />
+      <textarea
+        class="form-control"
+        name="content"
+        placeholder="Your Tweet ...."
+      ></textarea>
+      <button type="submit" class="btn btn-primary">
+        Tweet
+      </button>
+    </form>
+  </div>
 </div>
 
-<div class="row" id="tweets">
-
-</div>
+<div class="row" id="tweets"></div>
 
 <script>
-    var tweetsElement = document.getElementById("tweets")
+  var tweetsElement = document.getElementById("tweets");
 
-    const xhr = new XMLHttpRequest()
+  const xhr = new XMLHttpRequest();
 
-    const method = 'GET'
-    const url = '/tweets'
-    const responseType = 'json'
+  const method = "GET";
+  const url = "/tweets";
+  const responseType = "json";
 
-    function handleDidLike(tweet_id,currentCount){
-        console.log(tweet_id,currentCount)
-        return
+  function handleDidLike(tweet_id, currentCount) {
+    console.log(tweet_id, currentCount);
+    return;
+  }
+
+  function likeBtn(tweet) {
+    return (
+      "<button class = 'btn btn-primary' onclick = handleDidLike(" +
+      tweet.id +
+      "," +
+      tweet.likes +
+      ")>" +
+      tweet.likes +
+      " Like</button>"
+    );
+  }
+
+  function formatTweetElement(tweet) {
+    var formattedTweet =
+      "<div class='mb-4 col-md-10 col-12 mx-auto py-3 border rounded' id='" +
+      tweet.id +
+      "'><p>" +
+      tweet.content +
+      "</p><div class = 'btn-group'>" +
+      likeBtn(tweet) +
+      "</div></div>";
+    return formattedTweet;
+  }
+
+  xhr.responseType = responseType;
+  xhr.open(method, url);
+  xhr.onload = function () {
+    const listedItems = xhr.response.response;
+    var finalTweetStr = "";
+    var i;
+    for (i = 0; i < listedItems.length; i++) {
+      var tweetObj = listedItems[i];
+      var currentItem = formatTweetElement(tweetObj);
+      finalTweetStr += currentItem;
     }
-
-    function likeBtn(tweet)
-    {
-        return "<button class = 'btn btn-primary' onclick = handleDidLike("+tweet.id+","+tweet.likes+")>"+tweet.likes+" Like</button>"
-    }
-
-    function formatTweetElement(tweet)
-    {
-        var formattedTweet = "<div class='mb-4 col-md-10 col-12 mx-auto py-3 border rounded' id='"+tweet.id+"'><p>"+tweet.content+
-            "</p><div class = 'btn-group'>"+likeBtn(tweet)+"</div></div>";
-        return formattedTweet
-    }
-
-    xhr.responseType = responseType
-    xhr.open(method,url)
-    xhr.onload = function(){
-        const listedItems = xhr.response.response
-        var finalTweetStr = ""
-        var i
-        for(i=0; i<listedItems.length; i++){
-            var tweetObj = listedItems[i]
-            var currentItem = formatTweetElement(tweetObj)
-            finalTweetStr +=currentItem
-        }
-        // console.log(finalTweetStr)
-        tweetsElement.innerHTML = finalTweetStr
-    }
-    xhr.send()
-    
+    // console.log(finalTweetStr)
+    tweetsElement.innerHTML = finalTweetStr;
+  };
+  xhr.send();
 </script>
 {%endblock content%}
