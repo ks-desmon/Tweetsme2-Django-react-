@@ -2,12 +2,18 @@ from django import forms
 
 from .models import Tweet
 
-MAX_TWEET_LENGTH = 6
+from django.conf import settings
+
+MAX_TWEET_LENGTH = settings.MAX_TWEET_LENGTH
+
+# MAX_TWEET_LENGTH = 200
 
 
 class TweetForm(forms.ModelForm):
     class Meta:
+        # setting which model needs form
         model = Tweet
+        # setting or selecting the fields from model to show in form
         fields = ['content']
 
     # use for validation

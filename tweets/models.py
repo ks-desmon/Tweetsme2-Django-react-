@@ -9,7 +9,7 @@ User = settings.AUTH_USER_MODEL  # initialize user table in to databasetables
 class Tweet(models.Model):
     # Adding user table's primary key into Tweet table as ForeignKey
     # one user can have many tweets, if user delete so tweets too
-    User = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     # models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
     # one user can have many tweets, if user delete so tweets "null"
     content = models.TextField(null=True, blank=True)

@@ -6,8 +6,8 @@ from .models import Tweet
 
 
 class TweetAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'User']
-    search_fields = ['User__username', 'User__email']
+    # list_display = ['__str__', 'User']
+    # search_fields = ['User__username', 'User__email']
 
     class Meta:
         model = Tweet

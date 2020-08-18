@@ -124,6 +124,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Custome
+
 LOGIN_URL = 'login/'
+
+MAX_TWEET_LENGTH = 200
 
 # APPEND_SLASH=False

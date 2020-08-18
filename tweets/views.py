@@ -1,21 +1,51 @@
 import random
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
-from .models import Tweet
-from .form import TweetForm
 from django.conf import settings
 from django.utils.http import is_safe_url
+from .models import Tweet
+from .form import TweetForm
+from .serializers import TweetSerializers
+# replacing jsonresponse to response so no need to send status seprate
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
 # Create your views here.
 
 
 def home_view(request, *args, **kwargs):
-    print('hi there', args, kwargs)
+    # print('hi there', args, kwargs)
     print(request.user)
     # return HttpResponse('Hello world')
     return render(request, "pages/home.html", context={}, status=200)
 
 
+@api_view(['POST'])
 def tweet_create_view(request, *args, **kwargs):
+    serializer = TweetSerializers(data=request.POST)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=201)
+    return Response({}, status=400)
+
+
+@api_view(['GET'])
+def tweet_list_view(request, *args, **kwargs):
+    qs = Tweet.objects.all()
+    serializer = TweetSerializers(qs, many=True)
+    return Response(serializer.data, status=201)
+
+
+@api_view(['GET', 'POST'])
+def tweet_detail_view(request, tweet_id, *args, **kwargs):
+    qs = Tweet.objects.filter(id=tweet_id)
+    if not qs.exists():
+        return Response({}, status=404)
+    serializer = TweetSerializers(qs.first())
+    return Response(serializer.data, status=201)
+
+
+def tweet_create_view_pure_django(request, *args, **kwargs):
     user = request.user
     if not request.user.is_authenticated:
         print("user is not authenticated")
@@ -32,7 +62,7 @@ def tweet_create_view(request, *args, **kwargs):
         nextUrl = request.POST.get('next') or None
         obj = form.save(commit=False)
         # Do other form logic
-        obj.User = user
+        obj.user = user
         obj.save()
         if request.is_ajax():
             return JsonResponse(obj.serialize(), status=201)
@@ -47,7 +77,7 @@ def tweet_create_view(request, *args, **kwargs):
     return render(request, 'components/form.html', context={"form": form})
 
 
-def tweet_list_view(request, *args, **kwargs):
+def tweet_list_view_pure_django(request, *args, **kwargs):
     # select all values from model
     qs = Tweet.objects.all()
 
@@ -63,7 +93,7 @@ def tweet_list_view(request, *args, **kwargs):
     return JsonResponse(data, status=status)
 
 
-def tweet_detail_view(request, tweet_id, *args, **kwargs):
+def tweet_detail_view_pure_django(request, tweet_id, *args, **kwargs):
     # print(args , kwargs)
     # Get single data from model
     # try:
