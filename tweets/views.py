@@ -10,12 +10,21 @@ from django.utils.http import is_safe_url
 
 def home_view(request, *args, **kwargs):
     print('hi there', args, kwargs)
+    print(request.user)
     # return HttpResponse('Hello world')
     return render(request, "pages/home.html", context={}, status=200)
 
 
 def tweet_create_view(request, *args, **kwargs):
-    print('ajax', request.is_ajax())
+    user = request.user
+    if not request.user.is_authenticated:
+        print("user is not authenticated")
+        user = None
+        if request.is_ajax():
+            status = 401
+            return JsonResponse({}, status=401)
+        return redirect(settings.LOGIN_URL)
+    # print('ajax', request.is_ajax())
     ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
     form = TweetForm(request.POST or None)
@@ -23,6 +32,7 @@ def tweet_create_view(request, *args, **kwargs):
         nextUrl = request.POST.get('next') or None
         obj = form.save(commit=False)
         # Do other form logic
+        obj.User = user
         obj.save()
         if request.is_ajax():
             return JsonResponse(obj.serialize(), status=201)
