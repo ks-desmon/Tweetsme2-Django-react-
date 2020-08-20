@@ -41,7 +41,7 @@ def tweet_list_view(request, *args, **kwargs):
     return Response(serializer.data, status=201)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 def tweet_detail_view(request, tweet_id, *args, **kwargs):
     qs = Tweet.objects.filter(id=tweet_id)
     if not qs.exists():
