@@ -68,25 +68,30 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def tweet_Action_view(request, *args, **kwargs):
+def tweet_action_view(request, *args, **kwargs):
     '''Tweet id is req , Actions are like unlike retweet'''
-    serializer = TweetActionSerializer(data=request.POST)
+    # while receving/saving JSON.stringify(data) from js to db use request.data not request.POST
+    # print(request.data, "checking reqdata")
+    serializer = TweetActionSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        tweet_id = serializer.validated_data.get('id')
-        action = serializer.validated_data.get('action')
+        data = serializer.validated_data
+        tweet_id = data.get('id')
+        action = data.get('action')
         qs = Tweet.objects.filter(id=tweet_id)
         if not qs.exists():
-            return Response({}, status=404)
+            return Response({"'message': 'my time'"}, status=404)
         obj = qs.first()
         if action == "like":
-            obj.likes.add(request.user)
-            return Response({}, status=404)
+            data = obj.likes.add(request.user)
+            serializer = TweetSerializers(obj)
+            return Response(serializer.data, status=200)
         elif action == "unlike":
             obj.likes.remove(request.user)
-            return Response({}, status=404)
+            serializer = TweetSerializers(obj)
+            return Response(serializer.data, status=200)
         elif action == "retweet":
             pass
-    return Response({'message': 'delete tweet done'}, status=200)
+    return Response({}, status=200)
 
 # one button like unlike
 

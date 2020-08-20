@@ -12,21 +12,31 @@ TWEET_ACTION_OPTION = settings.TWEET_ACTION_OPTION
 # Serializer will take fields values from HTML
 # (can do it with POST.get('data')) but to validate we pass data here
 class TweetActionSerializer(serializers.Serializer):
-    id = serializers.IntegerField
+    id = serializers.IntegerField()
     action = serializers.CharField()
 
+    # Validate+action(feild need to validate)
     def validate_action(self, value):
         value = value.lower().strip()
         if not value in TWEET_ACTION_OPTION:
             raise serializers.ValidationError('Not a valid Tweet')
+        print(value, "validating")
         return value
 
 
 # ModelSerializer will take fields values from model
 class TweetSerializers(serializers.ModelSerializer):
+
+    # get the data from db need to place at top require
+    likes = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Tweet
-        fields = ['content']
+        fields = ['id', 'content', 'likes']
+
+    # counting the perticular field
+    def get_likes(self, obj):
+        return obj.likes.count()
 
     # validate_+field need to validate
     def validate_content(self, value):
