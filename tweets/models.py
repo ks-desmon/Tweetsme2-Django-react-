@@ -14,6 +14,7 @@ class TweetLike(models.Model):
 
 
 class Tweet(models.Model):
+    parent = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
     # Adding User table's primary key into Tweet table as ForeignKey in user field
     # one user can have many tweets, if user delete so tweets too
     user = models.ForeignKey(User, on_delete=models.CASCADE)

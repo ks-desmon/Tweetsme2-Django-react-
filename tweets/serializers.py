@@ -14,6 +14,7 @@ TWEET_ACTION_OPTION = settings.TWEET_ACTION_OPTION
 class TweetActionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     action = serializers.CharField()
+    content = serializers.CharField(allow_blank=True, required=False)
 
     # Validate+action(feild need to validate)
     def validate_action(self, value):
