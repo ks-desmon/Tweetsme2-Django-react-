@@ -38,7 +38,7 @@ def tweet_list_view(request, *args, **kwargs):
     qs = Tweet.objects.all()
     # converting obj into json form for response
     serializer = TweetSerializers(qs, many=True)
-    return Response(serializer.data, status=201)
+    return Response(serializer.data, status=200)
 
 
 @api_view(['GET'])
@@ -94,7 +94,7 @@ def tweet_action_view(request, *args, **kwargs):
             new_tweet = Tweet.objects.create(
                 user=request.user, parent=obj, content=content)
             serializer = TweetSerializers(new_tweet)
-            return Response(serializer.data, status=200)
+            return Response(serializer.data, status=201)
     return Response({}, status=200)
 
 # one button like unlike
