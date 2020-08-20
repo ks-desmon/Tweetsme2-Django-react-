@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils.http import is_safe_url
 from .models import Tweet
 from .form import TweetForm
-from .serializers import TweetSerializers
+from .serializers import TweetSerializers, TweetActionSerializer
 # replacing jsonresponse to response so no need to send status seprate
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -57,12 +57,53 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
     qs = Tweet.objects.filter(id=tweet_id)
     if not qs.exists():
         return Response({}, status=404)
+    # chcking user req and the user auth same
     qs = qs.filter(user=request.user)
     if not qs.exists():
         return Response({'message': 'You can not delete this tweet'}, status=401)
     obj = qs.first()
     obj.delete()
     return Response({'message': 'delete tweet done'}, status=200)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tweet_Action_view(request, *args, **kwargs):
+    '''Tweet id is req , Actions are like unlike retweet'''
+    serializer = TweetActionSerializer(data=request.POST)
+    if serializer.is_valid(raise_exception=True):
+        tweet_id = serializer.validated_data.get('id')
+        action = serializer.validated_data.get('action')
+        qs = Tweet.objects.filter(id=tweet_id)
+        if not qs.exists():
+            return Response({}, status=404)
+        obj = qs.first()
+        if action == "like":
+            obj.likes.add(request.user)
+            return Response({}, status=404)
+        elif action == "unlike":
+            obj.likes.remove(request.user)
+            return Response({}, status=404)
+        elif action == "retweet":
+            pass
+    return Response({'message': 'delete tweet done'}, status=200)
+
+# one button like unlike
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def tweet_Like_view(request, tweet_id, *args, **kwargs):
+#     qs = Tweet.objects.filter(id=tweet_id)
+#     if not qs.exists():
+#         return Response({}, status=404)
+#     obj = qs.first()
+#     if not request.user in obj.likes.all():
+#         obj.likes.add(request.user)
+#         return Response({}, status=404)
+#     else:
+#         obj.likes.remove(request.user)
+#         return Response({}, status=404)
+#     return Response({'message': 'delete tweet done'}, status=200)
 
 
 # ////////////////////////////////////////////////////////////////////////////////

@@ -130,6 +130,8 @@ LOGIN_URL = 'login/'
 
 MAX_TWEET_LENGTH = 200
 
+TWEET_ACTION_OPTION = ['like', 'unlike', 'retweet']
+
 # APPEND_SLASH=False
 if DEBUG:
     REST_FRAMEWORK = {
