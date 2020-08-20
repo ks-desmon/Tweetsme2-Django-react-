@@ -35,6 +35,11 @@ class Tweet(models.Model):
         # so data will store in reverse order and we will get latest data at the top
         ordering = ["-id"]
 
+    @property
+    def is_retweet(self):
+        return self.parent != None
+
+    # no need while using rest api or serializer
     def serialize(self):
         return{
             "id": self.id,
