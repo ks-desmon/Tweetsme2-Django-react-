@@ -10,6 +10,7 @@ export function TweetsComponent(props) {
     event.preventDefault();
     const newVal = textAreaRef.current.value;
     let tempNewTweets = [...newTweets];
+    // save data to server end
     tempNewTweets.unshift({
       content: newVal,
       likes: 0,
