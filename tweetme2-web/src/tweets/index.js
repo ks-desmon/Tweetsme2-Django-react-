@@ -1,3 +1,3 @@
-import { ActionBtn, Tweet, TweetList } from "./component";
+import { ActionBtn, Tweet, TweetList, TweetsComponent } from "./component";
 
-export { ActionBtn, Tweet, TweetList };
+export { ActionBtn, Tweet, TweetList, TweetsComponent };
