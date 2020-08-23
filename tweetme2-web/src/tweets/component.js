@@ -8,15 +8,22 @@ export function TweetsComponent(props) {
   // collect the value from textare
   const handleSubmit = (event) => {
     event.preventDefault();
+
     const newVal = textAreaRef.current.value;
+
     let tempNewTweets = [...newTweets];
+
     // save data to server end
     tempNewTweets.unshift({
       content: newVal,
       likes: 0,
       id: 123,
     });
+
+    console.log(tempNewTweets);
+
     setNewTweets(tempNewTweets);
+
     textAreaRef.current.value = "";
   };
   // Rendering form and list of tweets
@@ -57,7 +64,7 @@ export function TweetList(props) {
     };
     loadTweets(mycallback);
   }, []);
-
+  // Works as same window on load
   useEffect(() => {
     // concate the data and new data
     let final = [...props.newTweets].concat(tweetsInit);
