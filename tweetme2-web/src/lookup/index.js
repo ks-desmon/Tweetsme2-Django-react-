@@ -1,2 +1,2 @@
-import { loadTweets } from "./compoment";
-export { loadTweets };
+import { loadTweets, createTweets } from "./compoment";
+export { loadTweets, createTweets };

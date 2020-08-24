@@ -4,7 +4,7 @@
     <h1>Welcome tweetme</h1>
   </div>
 </div>
-<div class="row mb-3">
+<div class="row mb-3 d-none">
   <div class="col-md-4 mx-auto col-10">
     <form class="form" id="tweet-create-form" method="POST" action="create-tweet/">
       {% csrf_token %}
@@ -17,7 +17,10 @@
     </form>
   </div>
 </div>
-<div class="row" id="tweets"></div>
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div class=" d-none row" id="tweets"></div>
+<div id="tweetme-2"></div>
+
 <script>
   function handleTweetFormError(msg, display) {
     const myErrorDiv = document.getElementById("tweet-create-form-error");

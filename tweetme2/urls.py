@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    path('react/', TemplateView.as_view(template_name='react.html')),
+    path('react/', TemplateView.as_view(template_name='react_via_dj.html')),
     path('admin/', admin.site.urls),
     path('', home_view),
     path('create-tweet/', tweet_create_view),

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { loadTweets } from "../lookup";
+import { loadTweets, createTweets } from "../lookup";
 
 // This Form componemt
 export function TweetsComponent(props) {
@@ -14,15 +14,25 @@ export function TweetsComponent(props) {
     let tempNewTweets = [...newTweets];
 
     // save data to server end
-    tempNewTweets.unshift({
-      content: newVal,
-      likes: 0,
-      id: 123,
+    // tempNewTweets.unshift({
+    //   content: newVal,
+    //   likes: 0,
+    //   id: 123,
+    // });
+
+    createTweets(newVal, (response, status) => {
+      console.log(status);
+      if (status === 201) {
+        tempNewTweets.unshift(response);
+        console.log("my time");
+        setNewTweets(tempNewTweets);
+      } else {
+        console.log(status);
+        // alert("error while sending data");
+      }
     });
 
-    console.log(tempNewTweets);
-
-    setNewTweets(tempNewTweets);
+    // console.log(tempNewTweets);
 
     textAreaRef.current.value = "";
   };
@@ -51,19 +61,24 @@ export function TweetsComponent(props) {
 export function TweetList(props) {
   const [tweetsInit, setTweetInit] = useState([]);
   const [tweets, setTweets] = useState([]);
+  const [tweetsDidSet, setTweetsDidSet] = useState(false);
 
   // Will get the response data from response and set inside a state tweetsInit
 
   useEffect(() => {
-    const mycallback = (response, status) => {
-      if (status === 200) {
-        setTweetInit(response);
-      } else {
-        alert("there was an error");
-      }
-    };
-    loadTweets(mycallback);
-  }, []);
+    // if condition will make sure that funtion will hit only one time to server
+    if (tweetsDidSet === false) {
+      setTweetsDidSet(!tweetsDidSet);
+      const mycallback = (response, status) => {
+        if (status === 200) {
+          setTweetInit(response);
+        } else {
+          alert("there was an error");
+        }
+      };
+      loadTweets(mycallback);
+    }
+  }, [tweetsInit, tweetsDidSet, setTweetsDidSet]);
   // Works as same window on load
   useEffect(() => {
     // concate the data and new data

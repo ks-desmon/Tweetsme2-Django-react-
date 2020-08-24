@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
+# from corsheaders.defaults import default_headers
 import os
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...) where manage.py is placed
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print("\n This is Base Dir \n", BASE_DIR, "\n")
@@ -146,25 +146,30 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
 
 # APPEND_SLASH=False
+
+# ADDED BECAUSE GETTING ERROR ON REACT SERVER SITE
+# WHILE ADDING CSRF HEADER ON POSTING TWEET
+# UNCOMMENT THAT AND YOU WILL GET THAT ERROR
+# CORS_ALLOW_HEADERS = default_headers + \
+#     ('HTTP_X_REQUESTED_WITH', 'X-CSRFToken', )
+
+
+DEFAULT_RENDERER_CLASSES = [
+    'rest_framework.renderers.JSONRenderer',
+]
+
+DEFAULT_AUTHENTICATION_CLASSES = [
+    'rest_framework.authentication.SessionAuthentication'
+]
 if DEBUG:
-    REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': [
-            'rest_framework.authentication.SessionAuthentication',
-            'rest_framework.authentication.BasicAuthentication'
-        ],
-        'DEFAULT_RENDERER_CLASSES': [
-            'rest_framework.renderers.JSONRenderer',
-            'rest_framework.renderers.BrowsableAPIRenderer',
-        ]
-    }
-else:
-    REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': [
-            'rest_framework.authentication.SessionAuthentication',
-            'rest_framework.authentication.BasicAuthentication'
-        ],
-        'DEFAULT_RENDERER_CLASSES': [
-            'rest_framework.renderers.JSONRenderer',
-            # 'rest_framework.renderers.BrowsableAPIRenderer',
-        ]
-    }
+    DEFAULT_RENDERER_CLASSES += [
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
+    DEFAULT_AUTHENTICATION_CLASSES += [
+        'tweetme2.rest_api.dev.DevAuthentication'
+    ]
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': DEFAULT_AUTHENTICATION_CLASSES,
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+}
