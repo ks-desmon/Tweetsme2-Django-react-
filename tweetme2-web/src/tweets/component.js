@@ -1,42 +1,53 @@
 import React, { useEffect, useState } from "react";
-import { loadTweets, createTweets } from "../lookup";
+import { apiTweetList, apiTweetCreate, apiTweetAction } from "./lookup";
 
-// This Form componemt
+// FORM COMPONENT TO SEND TWEET IN DATABASE
+// RELOAD TWEETLIST SAME TIME
 export function TweetsComponent(props) {
   const textAreaRef = React.createRef();
   const [newTweets, setNewTweets] = useState([]);
-  // collect the value from textare
+
+  //FUNCTION TO SAVING DATA TO SERVER-END
+
+  const handleBackendUpdate = (response, status) => {
+    // BACKEND API RESPONSE HANDLER
+
+    console.log(status);
+    let tempNewTweets = [...newTweets];
+    if (status === 201) {
+      tempNewTweets.unshift(response);
+      // AFTER SENDING DATA TO TWEET RELOAD TWEET AGAIN
+
+      setNewTweets(tempNewTweets);
+    } else {
+      console.log(status);
+      // alert("error while sending data");
+    }
+  };
+
+  // COLLECT THE VALUE FROM TEXTARE
+
   const handleSubmit = (event) => {
+    // BACKEND API REQUEST
+
     event.preventDefault();
 
     const newVal = textAreaRef.current.value;
 
-    let tempNewTweets = [...newTweets];
-
-    // save data to server end
-    // tempNewTweets.unshift({
-    //   content: newVal,
-    //   likes: 0,
-    //   id: 123,
-    // });
-
-    createTweets(newVal, (response, status) => {
-      console.log(status);
-      if (status === 201) {
-        tempNewTweets.unshift(response);
-        console.log("my time");
-        setNewTweets(tempNewTweets);
-      } else {
-        console.log(status);
-        // alert("error while sending data");
-      }
-    });
+    // WILL STORE TWEET INTO DATA BASE
+    // THEN WILL CALL (handleBackendUpdate) FUNCTION
+    // TO GET SAME TWEET BACK AS RESPONSE WITH
+    // CORRECT ID AND LIKES
+    // THEN RELOAD THE TWEET LIST
+    apiTweetCreate(newVal, handleBackendUpdate);
 
     // console.log(tempNewTweets);
 
     textAreaRef.current.value = "";
   };
-  // Rendering form and list of tweets
+
+  //RENDRING FORM AND LIST OF TWEETS
+
   return (
     <div className={props.className}>
       <div className="col-12 mb-3">
@@ -51,22 +62,26 @@ export function TweetsComponent(props) {
           </button>
         </form>
       </div>
-      {/* contains list of tweets */}
+      {/* CONTAINS LIST OF TWEETS */}
       <TweetList newTweets={newTweets} />
     </div>
   );
 }
 
-// Gettuing the http response data and redring them
+// GETTING THE HTTP RESPONSE DATA
+// RENDRING THEM LOADING TWEETS
 export function TweetList(props) {
   const [tweetsInit, setTweetInit] = useState([]);
   const [tweets, setTweets] = useState([]);
   const [tweetsDidSet, setTweetsDidSet] = useState(false);
 
-  // Will get the response data from response and set inside a state tweetsInit
+  // WILL GET THE RESPONSE DATA FROM RESPONSE
+  // SET INSIDE A STATE TWEETSINIT
 
   useEffect(() => {
-    // if condition will make sure that funtion will hit only one time to server
+    // IF CONDITION WILL MAKE SURE
+    // THAT FUNTION WILL HIT ONLY ONE TIME TO SERVER
+
     if (tweetsDidSet === false) {
       setTweetsDidSet(!tweetsDidSet);
       const mycallback = (response, status) => {
@@ -76,21 +91,24 @@ export function TweetList(props) {
           alert("there was an error");
         }
       };
-      loadTweets(mycallback);
+      apiTweetList(mycallback);
     }
   }, [tweetsInit, tweetsDidSet, setTweetsDidSet]);
-  // Works as same window on load
+
+  // WORKS AS SAME WINDOW ON LOAD
+
   useEffect(() => {
-    // concate the data and new data
+    // CONCATE THE DATA AND NEW DATA
     let final = [...props.newTweets].concat(tweetsInit);
 
-    //setting the concat data into new hook tweets // if condition in for second time
+    // SETTING THE CONCAT DATA INTO NEW HOOK TWEETS
+    // IF CONDITION IN FOR SECOND TIME
     if (final.length !== tweets.length) {
       setTweets(final);
     }
   }, [tweetsInit, props.newTweets, tweets]);
 
-  // looping through data one by one to sending Tweet for creating html
+  // LOOPING THROUGH DATA ONE BY ONE TO SENDING TWEET FOR CREATING HTML
 
   return tweets.map((item, index) => {
     return (
@@ -103,7 +121,7 @@ export function TweetList(props) {
   });
 }
 
-// creating the div for eact div and passing data further to create buttons
+// CREATING THE DIV FOR EACT DIV AND PASSING DATA FURTHER TO CREATE BUTTONS
 
 export function Tweet(props) {
   const { tweet } = props;
@@ -115,7 +133,7 @@ export function Tweet(props) {
         {tweet.id} - {tweet.content}
       </p>
 
-      {/* calling buttons here and passing the data */}
+      {/* CALLING BUTTONS HERE AND PASSING THE DATA */}
 
       <div className="btn btn-group ">
         <ActionBtn tweet={tweet} action={{ type: "like", display: "like" }} />
@@ -132,40 +150,45 @@ export function Tweet(props) {
   );
 }
 
-// Returning buttons to Tweet
+// RETURNING BUTTONS TO TWEET
 
 export function ActionBtn(props) {
   const { tweet, action } = props;
   const className = "btn btn-primary";
 
-  // If value comming as undefine convert it in to zero
+  // IF VALUE COMMING AS UNDEFINE CONVERT IT IN TO ZERO
 
   const [likes, setlikes] = useState(tweet.likes ? tweet.likes : 0);
 
-  // toggeling for like button
+  // TOGGELING FOR LIKE BUTTON
 
   const [userlike, setuserlike] = useState(
     tweet.userlike === true ? true : false
   );
 
   const classname = props.className ? props.className : className;
-  // setting the actiondisplay to check wether action is comming or not
+  // SETTING THE ACTIONDISPLAY TO CHECK WETHER ACTION IS COMMING OR NOT
   const actiondisplay = action.display ? action.display : "Action";
 
-  // already liked can not be liked again first it will be dislike
+  const handleActionBackendEvent = (response, status) => {
+    console.log(status, response);
+  };
+
+  // ALREADY LIKED CAN NOT BE LIKED AGAIN FIRST IT WILL BE DISLIKE
   const handleClike = (event) => {
     event.preventDefault();
-    if (action.type === "like") {
-      if (userlike === true) {
-        setlikes(likes - 1);
-        setuserlike(false);
-      } else {
-        setlikes(tweet.likes + 1);
-        setuserlike(true);
-      }
-    }
+    apiTweetAction(tweet.id, action.type, handleActionBackendEvent);
+    // if (action.type === "like") {
+    //   if (userlike === true) {
+    //     setlikes(likes - 1);
+    //     setuserlike(false);
+    //   } else {
+    //     setlikes(tweet.likes + 1);
+    //     setuserlike(true);
+    //   }
+    // }
   };
-  // if action is like show numbers of like else show only action
+  // IF ACTION IS LIKE SHOW NUMBERS OF LIKE ELSE SHOW ONLY ACTION
   const display =
     action.type === "like" ? `${likes} ${actiondisplay}` : actiondisplay;
   return (

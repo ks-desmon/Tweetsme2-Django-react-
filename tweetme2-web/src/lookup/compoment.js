@@ -14,7 +14,7 @@ function getCookie(name) {
   return cookieValue;
 }
 
-function lookup(method, endpoint, callback, data) {
+export function backendLookup(method, endpoint, callback, data) {
   let JsonData;
   if (data) {
     JsonData = JSON.stringify(data);
@@ -58,11 +58,11 @@ function lookup(method, endpoint, callback, data) {
   xhr.send(JsonData);
 }
 
-export function loadTweets(callback) {
-  lookup("GET", "/tweets/", callback);
-}
+// export function loadTweets(callback) {
+//   backendLookup("GET", "/tweets/", callback);
+// }
 
-export function createTweets(newTweets, callback) {
-  // console.log(newTweets, "mu name");
-  lookup("POST", "/tweets/create/", callback, { content: newTweets });
-}
+// export function createTweets(newTweets, callback) {
+//   // console.log(newTweets, "mu name");
+//   backendLookup("POST", "/tweets/create/", callback, { content: newTweets });
+// }

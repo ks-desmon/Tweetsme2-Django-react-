@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 # from corsheaders.defaults import default_headers
+
+from corsheaders.defaults import default_headers
 import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...) where manage.py is placed
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -150,6 +152,13 @@ CORS_URLS_REGEX = r'^/api/.*$'
 # ADDED BECAUSE GETTING ERROR ON REACT SERVER SITE
 # WHILE ADDING CSRF HEADER ON POSTING TWEET
 # UNCOMMENT THAT AND YOU WILL GET THAT ERROR
+CORS_ALLOW_HEADERS = default_headers + \
+    ('HTTP_X_REQUESTED_WITH', 'X-CSRFToken', )
+
+# ADDED BECAUSE GETTING ERROR ON REACT SERVER SITE
+# WHILE ADDING CSRF HEADER ON POSTING TWEET
+# UNCOMMENT THAT AND YOU WILL GET THAT ERROR
+# from corsheaders.defaults import default_headers
 # CORS_ALLOW_HEADERS = default_headers + \
 #     ('HTTP_X_REQUESTED_WITH', 'X-CSRFToken', )
 

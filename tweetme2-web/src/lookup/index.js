@@ -1,2 +1,2 @@
-import { loadTweets, createTweets } from "./compoment";
-export { loadTweets, createTweets };
+import { backendLookup } from "./compoment";
+export { backendLookup };
