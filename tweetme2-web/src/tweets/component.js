@@ -4,9 +4,10 @@ import { apiTweetList, apiTweetCreate, apiTweetAction } from "./lookup";
 // FORM COMPONENT TO SEND TWEET IN DATABASE
 // RELOAD TWEETLIST SAME TIME
 export function TweetsComponent(props) {
+  console.log(props);
   const textAreaRef = React.createRef();
   const [newTweets, setNewTweets] = useState([]);
-
+  const canTweet = props.canTweet === "false" ? false : true;
   //FUNCTION TO SAVING DATA TO SERVER-END
 
   const handleBackendUpdate = (response, status) => {
@@ -50,20 +51,22 @@ export function TweetsComponent(props) {
 
   return (
     <div className={props.className}>
-      <div className="col-12 mb-3">
-        <form onSubmit={handleSubmit}>
-          <textarea
-            ref={textAreaRef}
-            required={true}
-            className="form-control"
-          ></textarea>
-          <button type="submit" className="btn btn-primary my-3">
-            Tweet
-          </button>
-        </form>
-      </div>
+      {canTweet === true && (
+        <div className="col-12 mb-3">
+          <form onSubmit={handleSubmit}>
+            <textarea
+              ref={textAreaRef}
+              required={true}
+              className="form-control"
+            ></textarea>
+            <button type="submit" className="btn btn-primary my-3">
+              Tweet
+            </button>
+          </form>
+        </div>
+      )}
       {/* CONTAINS LIST OF TWEETS */}
-      <TweetList newTweets={newTweets} />
+      <TweetList newTweets={newTweets} {...props} />
     </div>
   );
 }
@@ -84,16 +87,16 @@ export function TweetList(props) {
 
     if (tweetsDidSet === false) {
       setTweetsDidSet(!tweetsDidSet);
-      const mycallback = (response, status) => {
+      const handleTweetListLookup = (response, status) => {
         if (status === 200) {
           setTweetInit(response);
         } else {
           alert("there was an error");
         }
       };
-      apiTweetList(mycallback);
+      apiTweetList(props.username, handleTweetListLookup);
     }
-  }, [tweetsInit, tweetsDidSet, setTweetsDidSet]);
+  }, [tweetsInit, tweetsDidSet, setTweetsDidSet, props.username]);
 
   // WORKS AS SAME WINDOW ON LOAD
 
