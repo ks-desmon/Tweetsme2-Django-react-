@@ -108,11 +108,21 @@ export function TweetList(props) {
     }
   }, [tweetsInit, props.newTweets, tweets]);
 
+  const handleDidRetweet = (newTweet) => {
+    const updatedTweetInit = [...tweetsInit];
+    updatedTweetInit.unshift(newTweet);
+    setTweetInit(updatedTweetInit);
+    const updatedFinalTweets = [...tweets];
+    updatedFinalTweets.unshift(tweets);
+    setTweets(updatedFinalTweets);
+  };
+
   // LOOPING THROUGH DATA ONE BY ONE TO SENDING TWEET FOR CREATING HTML
 
   return tweets.map((item, index) => {
     return (
       <Tweet
+        didRetweet={handleDidRetweet}
         tweet={item}
         key={index}
         className="my-5 py-5 border bg-white text-dark"
@@ -123,7 +133,7 @@ export function TweetList(props) {
 
 // CREATING THE DIV FOR EACT DIV AND PASSING DATA FURTHER TO CREATE BUTTONS
 export function Tweet(props) {
-  const { tweet } = props;
+  const { tweet, didRetweet, hideActions } = props;
   const [actionTweet, SetActionTweet] = useState(
     props.tweet ? props.tweet : null
   );
@@ -134,7 +144,9 @@ export function Tweet(props) {
     if (status === 200) {
       SetActionTweet(newActionTweet);
     } else if (status === 201) {
-      //LET THE TWEET LIST KNOW
+      if (didRetweet) {
+        didRetweet(newActionTweet);
+      }
     }
   };
   return (
@@ -147,7 +159,7 @@ export function Tweet(props) {
       </div>
 
       {/* CALLING BUTTONS HERE AND PASSING THE DATA */}
-      {actionTweet && (
+      {actionTweet && hideActions !== true && (
         <div className="btn btn-group ">
           <ActionBtn
             tweet={actionTweet}
@@ -177,7 +189,7 @@ export function ParentTweet(props) {
     <div className="row">
       <div className="col-11 mx-auto p-3 border rounded">
         <p className="mb-0 text-muted small">Retweet</p>
-        <Tweet className="" tweet={tweet.parent} />
+        <Tweet hideActions className="" tweet={tweet.parent} />
       </div>
     </div>
   ) : null;
