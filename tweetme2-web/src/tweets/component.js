@@ -122,49 +122,82 @@ export function TweetList(props) {
 }
 
 // CREATING THE DIV FOR EACT DIV AND PASSING DATA FURTHER TO CREATE BUTTONS
-
 export function Tweet(props) {
   const { tweet } = props;
+  const [actionTweet, SetActionTweet] = useState(
+    props.tweet ? props.tweet : null
+  );
   const className = "col-10 col-md-12 mx-auto";
   const classname = props.className ? props.className : className;
+
+  const handlePerformAction = (newActionTweet, status) => {
+    if (status === 200) {
+      SetActionTweet(newActionTweet);
+    } else if (status === 201) {
+      //LET THE TWEET LIST KNOW
+    }
+  };
   return (
     <div className={classname}>
-      <p>
-        {tweet.id} - {tweet.content}
-      </p>
+      <div>
+        <p>
+          {tweet.id} - {tweet.content}
+        </p>
+        <ParentTweet tweet={tweet} />
+      </div>
 
       {/* CALLING BUTTONS HERE AND PASSING THE DATA */}
-
-      <div className="btn btn-group ">
-        <ActionBtn tweet={tweet} action={{ type: "like", display: "like" }} />
-        <ActionBtn
-          tweet={tweet}
-          action={{ type: "unlike", display: "unlike" }}
-        />
-        <ActionBtn
-          tweet={tweet}
-          action={{ type: "retweet", display: "retweet" }}
-        />
-      </div>
+      {actionTweet && (
+        <div className="btn btn-group ">
+          <ActionBtn
+            tweet={actionTweet}
+            didPerformAction={handlePerformAction}
+            action={{ type: "like", display: "Like" }}
+          />
+          <ActionBtn
+            tweet={actionTweet}
+            didPerformAction={handlePerformAction}
+            action={{ type: "unlike", display: "Unlike" }}
+          />
+          <ActionBtn
+            tweet={actionTweet}
+            didPerformAction={handlePerformAction}
+            action={{ type: "retweet", display: "Retweet" }}
+          />
+        </div>
+      )}
     </div>
   );
+}
+
+// CREATING PARENT TWEET
+export function ParentTweet(props) {
+  const { tweet } = props;
+  return tweet.parent ? (
+    <div className="row">
+      <div className="col-11 mx-auto p-3 border rounded">
+        <p className="mb-0 text-muted small">Retweet</p>
+        <Tweet className="" tweet={tweet.parent} />
+      </div>
+    </div>
+  ) : null;
 }
 
 // RETURNING BUTTONS TO TWEET
 
 export function ActionBtn(props) {
-  const { tweet, action } = props;
+  const { tweet, action, didPerformAction } = props;
   const className = "btn btn-primary";
 
   // IF VALUE COMMING AS UNDEFINE CONVERT IT IN TO ZERO
 
-  const [likes, setlikes] = useState(tweet.likes ? tweet.likes : 0);
+  const likes = tweet.likes ? tweet.likes : 0;
 
   // TOGGELING FOR LIKE BUTTON
 
-  const [userlike, setuserlike] = useState(
-    tweet.userlike === true ? true : false
-  );
+  // const [userlike, setuserlike] = useState(
+  //   tweet.userlike === true ? true : false
+  // );
 
   const classname = props.className ? props.className : className;
   // SETTING THE ACTIONDISPLAY TO CHECK WETHER ACTION IS COMMING OR NOT
@@ -172,6 +205,11 @@ export function ActionBtn(props) {
 
   const handleActionBackendEvent = (response, status) => {
     console.log(status, response);
+    if ((status === 200 || status === 201) && didPerformAction) {
+      //setlikes(response.likes);
+      didPerformAction(response, status);
+      // setuserlike(true);
+    }
   };
 
   // ALREADY LIKED CAN NOT BE LIKED AGAIN FIRST IT WILL BE DISLIKE
